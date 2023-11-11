@@ -32,7 +32,7 @@ impl<const PAGE_SIZE: usize> BaseAllocator for EarlyAllocator<PAGE_SIZE> {
         }
     }
 
-    fn add_memory(&mut self, start: usize, size: usize) -> AllocResult {
+    fn add_memory(&mut self, _start: usize, _size: usize) -> AllocResult {
         panic!("Can't")
     }
 }
@@ -55,7 +55,7 @@ impl<const PAGE_SIZE: usize> ByteAllocator for EarlyAllocator<PAGE_SIZE> {
         Ok(NonNull::new(ptr).expect("should have skipped zero address"))
     }
 
-    fn dealloc(&mut self, pos: NonNull<u8>, layout: core::alloc::Layout) {
+    fn dealloc(&mut self, _pos: NonNull<u8>, _layout: core::alloc::Layout) {
         // Can't
     }
 
@@ -91,7 +91,7 @@ impl<const PAGE_SIZE: usize> PageAllocator for EarlyAllocator<PAGE_SIZE> {
         Ok(res)
     }
 
-    fn dealloc_pages(&mut self, pos: usize, num_pages: usize) {
+    fn dealloc_pages(&mut self, _pos: usize, _num_pages: usize) {
         // Can't
     }
 
