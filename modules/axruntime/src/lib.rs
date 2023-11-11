@@ -140,6 +140,22 @@ pub extern "C" fn rust_main(cpu_id: usize, dtb: usize) -> ! {
     #[cfg(feature = "alloc")]
     init_allocator();
 
+    // Parse fdt for early memory info
+    let dtb_info = match unsafe { parse_dtb(dtb) } {
+        Ok(info) => info,
+        Err(err) => panic!("Bad dtb {:?}", err),
+    };
+    info!("DTB info: ==================================");
+    info!(
+        "Memory: {:#x}, size: {:#x}",
+        dtb_info.memory_addr, dtb_info.memory_size
+    );
+    info!("Virtio_mmio[{}]:", dtb_info.mmio_regions.len());
+    for r in dtb_info.mmio_regions {
+        info!("\t{:#x}, size: {:#x}", r.0, r.1);
+    }
+    info!("============================================");
+
     #[cfg(feature = "paging")]
     {
         info!("Initialize kernel page table...");
@@ -189,6 +205,15 @@ pub extern "C" fn rust_main(cpu_id: usize, dtb: usize) -> ! {
         core::hint::spin_loop();
     }
 
+    {
+        let ga = axalloc::global_allocator();
+
+        info!(
+            "Used pages {} / Used bytes {}",
+            ga.used_pages(),
+            ga.used_bytes()
+        );
+    }
     unsafe { main() };
 
     #[cfg(feature = "multitask")]
@@ -200,6 +225,67 @@ pub extern "C" fn rust_main(cpu_id: usize, dtb: usize) -> ! {
     }
 }
 
+extern crate alloc;
+use alloc::vec::Vec;
+
+struct DtbInfo {
+    memory_addr: usize,
+    memory_size: usize,
+    mmio_regions: Vec<(usize, usize)>,
+}
+
+fn fdt_find_memory(mut iter: fdt_iter::Iter) -> Option<(usize, usize)> {
+    let node = iter.node();
+    let na = node.address_cells();
+    let ns = node.size_cells();
+
+    while let Some(child) = iter.next_child() {
+        let node = child.node();
+
+        if node.property("device_type") == Some(b"memory\0") {
+            if let Some(reg) = node.reg(na, ns) {
+                if let Some((addr, size)) = { reg }.next() {
+                    return Some((addr as usize, size as usize));
+                }
+            }
+        }
+    }
+    None
+}
+
+fn fdt_find_mmio(mut iter: fdt_iter::Iter, regions: &mut Vec<(usize, usize)>) {
+    let node = iter.node();
+    let na = node.address_cells();
+    let ns = node.size_cells();
+
+    while let Some(child) = iter.next_child() {
+        let node = child.node();
+
+        if node.compatible_with("simple-bus").unwrap_or(false) {
+            fdt_find_mmio(child, regions);
+        } else if node.compatible_with("virtio,mmio").unwrap_or(false) {
+            if let Some(reg) = node.reg(na, ns) {
+                for (addr, size) in reg {
+                    regions.push((addr as usize, size as usize));
+                }
+            }
+        }
+    }
+}
+
+unsafe fn parse_dtb(dtb_pa: usize) -> Result<DtbInfo, fdt_iter::FdtError> {
+    // SAFETY: Caller guarantees dtb_pa is valid
+    let fdt = unsafe { fdt_iter::Fdt::from_ptr(dtb_pa as _)? };
+    let (memory_addr, memory_size) = fdt_find_memory(fdt.root().walker().iter()).unwrap_or((0, 0));
+    let mut mmio_regions = Vec::new();
+    fdt_find_mmio(fdt.root().walker().iter(), &mut mmio_regions);
+
+    Ok(DtbInfo {
+        memory_addr,
+        memory_size,
+        mmio_regions,
+    })
+}
 #[cfg(feature = "alloc")]
 fn init_allocator() {
     use axhal::mem::{memory_regions, phys_to_virt, MemRegionFlags};

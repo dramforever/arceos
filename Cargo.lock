@@ -458,6 +458,7 @@ dependencies = [
  "axnet",
  "axtask",
  "crate_interface",
+ "fdt_iter",
  "kernel_guard",
  "lazy_init",
  "percpu",
@@ -835,6 +836,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cstr"
+version = "0.2.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8aa998c33a6d3271e3678950a22134cd7dd27cef86dee1b611b5b14207d1d90b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
 name = "defmt"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -997,6 +1008,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "fdt_iter"
+version = "0.1.0"
+dependencies = [
+ "cstr",
+ "hex-literal",
+ "nom",
+ "zerocopy",
+]
+
+[[package]]
 name = "flatten_objects"
 version = "0.1.0"
 dependencies = [
@@ -1072,6 +1093,12 @@ name = "hermit-abi"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "443144c8cdadd93ebf52ddb4056d257f5b52c04d3c804e657d19eb73fc33668b"
+
+[[package]]
+name = "hex-literal"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
 
 [[package]]
 name = "iana-time-zone"
