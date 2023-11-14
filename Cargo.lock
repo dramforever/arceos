@@ -999,6 +999,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "ex5"
+version = "0.1.0"
+dependencies = [
+ "axstd",
+]
+
+[[package]]
 name = "fatfs"
 version = "0.4.0"
 source = "git+https://github.com/rafalh/rust-fatfs?rev=a3a834e#a3a834ef92d94dd227c316c0887654dab00ae085"

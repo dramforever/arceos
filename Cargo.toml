@@ -57,6 +57,7 @@ members = [
     "ulib/axlibc",
 
     "apps/display",
+    "apps/ex5",
     "apps/exception",
     "apps/helloworld",
     "apps/memtest",

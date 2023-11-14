@@ -1,0 +1,12 @@
+[package]
+name = "ex5"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axstd = { path = "../../ulib/axstd", features = [
+    "alloc",
+    "multitask",
+    "sched_fifo",
+    "irq",
+], optional = true }
