@@ -57,6 +57,8 @@ ifeq ($(QEMU_LOG), y)
   qemu_args-y += -D qemu.log -d in_asm,int,mmu,pcall,cpu_reset,guest_errors
 endif
 
+qemu_args-y += -drive if=pflash,file=$(CURDIR)/payload/apps.bin,format=raw,unit=1
+
 qemu_args-debug := $(qemu_args-y) -s -S
 
 # Do not use KVM for debugging

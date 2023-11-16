@@ -1,0 +1,7 @@
+[package]
+name = "arceos-loader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axstd = { path = "../../ulib/axstd", optional = true }
