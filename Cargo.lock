@@ -116,6 +116,7 @@ name = "arceos-loader"
 version = "0.1.0"
 dependencies = [
  "axstd",
+ "cpio_reader",
 ]
 
 [[package]]
@@ -746,6 +747,15 @@ name = "core_detect"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
+
+[[package]]
+name = "cpio_reader"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "625db7965478dc700951b2e15e9144863a0dacb31f60b0eb799c7a7b975afb5c"
+dependencies = [
+ "bitflags 1.3.2",
+]
 
 [[package]]
 name = "crate_interface"
