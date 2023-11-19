@@ -7,3 +7,5 @@ edition = "2021"
 axstd = { path = "../../ulib/axstd", optional = true }
 cpio_reader = "0.1.1"
 elf = { version = "0.7.3", default-features = false }
+axconfig = { path = "../../modules/axconfig" }
+riscv = "0.10.1"

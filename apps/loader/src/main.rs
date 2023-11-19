@@ -8,14 +8,51 @@ use elf::{endian::AnyEndian, ElfBytes};
 const PLASH_START: usize = 0x22000000;
 const PLASH_SIZE: usize = 32 << 20; // 32 MiB
 
-const RUN_START: usize = 0xffff_ffc0_8010_0000;
-const RUN_SIZE: usize = 1 << 20; // 1 MiB
+const RUN_START: usize = 0x4000_0000;
+const RUN_SIZE: usize = 16 << 12; // 16 pages
 
 const SYS_HELLO: usize = 1;
 const SYS_PUTCHAR: usize = 2;
 const SYS_TERMINATE: usize = 3;
 
 static mut ABI_TABLE: [usize; 16] = [0; 16];
+
+#[link_section = ".data.app_page_table"]
+static mut APP_PT_SV39: [u64; 512] = [0; 512];
+
+#[link_section = ".data.app_page_table"]
+static mut APP_PT_SV39_1: [u64; 512] = [0; 512];
+
+#[link_section = ".data.app_page_table"]
+static mut APP_PT_SV39_0: [u64; 512] = [0; 512];
+
+unsafe fn init_app_page_table() {
+    // 0x8000_0000..0xc000_0000, VRWX_GAD, 1G block
+    APP_PT_SV39[2] = (0x80000 << 10) | 0xef;
+    // 0xffff_ffc0_8000_0000..0xffff_ffc0_c000_0000, VRWX_GAD, 1G block
+    APP_PT_SV39[0x102] = (0x80000 << 10) | 0xef;
+    // 0x0000_0000..0x4000_0000, VRWX_GAD, 1G block
+    APP_PT_SV39[0] = (0x00000 << 10) | 0xef;
+
+    let pt_1_pa = APP_PT_SV39_1.as_ptr() as usize - axconfig::PHYS_VIRT_OFFSET;
+    let pt_0_pa = APP_PT_SV39_0.as_ptr() as usize - axconfig::PHYS_VIRT_OFFSET;
+
+    // For App aspace!
+    APP_PT_SV39[1] = (pt_1_pa as u64 >> 12 << 10) | 0x21;
+    APP_PT_SV39_1[0] = (pt_0_pa as u64 >> 12 << 10) | 0x21;
+
+    use riscv::register::satp;
+    let page_table_root = APP_PT_SV39.as_ptr() as usize - axconfig::PHYS_VIRT_OFFSET;
+    satp::set(satp::Mode::Sv39, 0, page_table_root >> 12);
+    riscv::asm::sfence_vma_all();
+}
+
+unsafe fn switch_app_aspace(addr: usize) {
+    for a in (0..RUN_SIZE).step_by(1 << 12) {
+        APP_PT_SV39_0[a >> 12] = ((addr + a) as u64 >> 12 << 10) | 0xef;
+    }
+    riscv::asm::sfence_vma_all();
+}
 
 fn register_abi(num: usize, handle: usize) {
     unsafe {
@@ -75,9 +112,19 @@ fn main() {
 
     let pflash = unsafe { core::slice::from_raw_parts(PLASH_START as *const u8, PLASH_SIZE) };
 
+    unsafe {
+        init_app_page_table();
+    };
+
+    let mut pa = 0x8010_0000;
+
     for entry in cpio_reader::iter_files(pflash) {
+        unsafe {
+            switch_app_aspace(pa);
+        }
+
         assert!(entry.mode().contains(cpio_reader::Mode::REGULAR_FILE));
-        println!("Running {}", entry.name());
+        println!("Running {} at physical address {:#x}", entry.name(), pa);
 
         let code = entry.file();
 
@@ -85,5 +132,7 @@ fn main() {
             let entry = load_code(code);
             call_code(entry);
         }
+
+        pa += RUN_SIZE;
     }
 }
