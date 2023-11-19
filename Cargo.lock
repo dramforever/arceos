@@ -115,7 +115,9 @@ dependencies = [
 name = "arceos-loader"
 version = "0.1.0"
 dependencies = [
+ "axconfig",
  "axstd",
+ "riscv",
 ]
 
 [[package]]

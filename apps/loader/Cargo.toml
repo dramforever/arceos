@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 axstd = { path = "../../ulib/axstd", optional = true }
+axconfig = { path = "../../modules/axconfig" }
+riscv = "0.10.1"
