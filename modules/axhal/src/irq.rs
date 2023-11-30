@@ -17,6 +17,12 @@ pub(crate) fn dispatch_irq_common(irq_num: usize) {
     trace!("IRQ {}", irq_num);
     if !IRQ_HANDLER_TABLE.handle(irq_num) {
         warn!("Unhandled IRQ {}", irq_num);
+
+        info!("todo external interrupt preempt");
+        let ptr = 0xc201004 as *mut u32;
+        unsafe { ptr.write_volatile(ptr.read_volatile()); }
+        unsafe { core::arch::asm!("csrs hvip, {}", in(reg) 1usize << 10)}
+
     }
 }
 

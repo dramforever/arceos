@@ -11,7 +11,7 @@ ifeq ($(ARCH), riscv64)
   GUEST_BIN ?= apps/hv/guest/$(GUEST)/$(GUEST).bin
   GUEST_BIOS ?=
 else ifeq ($(ARCH), x86_64)
-  GUEST_DTB ?= 
+  GUEST_DTB ?=
   GUEST_BIN ?= apps/hv/guest/nimbos/nimbos.bin
   GUEST_BIOS ?= apps/hv/guest/nimbos/rvm-bios.bin
 else ifeq ($(ARCH), aarch64)
@@ -87,7 +87,7 @@ ifeq ($(GUEST), linux)
     qemu_args-$(HV) += \
       -drive file=$(ROOTFS),format=raw,id=hd0 \
 	    -device virtio-blk-device,drive=hd0 \
-	    -append "root=/dev/vda rw console=ttyS0" 
+	    -append "root=/dev/vda1 rw console=ttyS0"
   else ifeq ($(ARCH), aarch64)
     qemu_args-$(HV) += \
       -drive if=none,file=$(ROOTFS),format=raw,id=hd0 \
@@ -96,7 +96,7 @@ ifeq ($(GUEST), linux)
   else ifeq ($(ARCH), x86_64)
     qemu_args-$(HV) += \
       -drive file=$(ROOTFS),format=raw,id=hd0 \
-	    -append "root=/dev/vda rw console=ttyS0" 
+	    -append "root=/dev/vda rw console=ttyS0"
     # qemu_args-$(HV) += \
     #   -device virtio-blk-pci,drive=hd0
   endif
@@ -120,6 +120,7 @@ ifeq ($(QEMU_LOG), y)
   qemu_args-y += -D qemu.log -d in_asm,int,mmu,pcall,cpu_reset,guest_errors
 endif
 
+qemu_args-y += -s -bios /home/dram/code/opensbi/build/platform/generic/firmware/fw_dynamic.elf
 qemu_args-debug := $(qemu_args-y) -s -S
 
 # Do not use KVM for debugging

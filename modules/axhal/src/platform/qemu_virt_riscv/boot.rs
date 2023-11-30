@@ -73,6 +73,8 @@ unsafe extern "C" fn _start_secondary() -> ! {
     // a0 = hartid
     // a1 = SP
     core::arch::asm!("
+        csrci   sstatus, 2
+
         mv      s0, a0                  // save hartid
         mv      sp, a1                  // set SP
 

@@ -132,6 +132,9 @@ unsafe extern "C" fn context_switch(_current_task: &mut TaskContext, _next_task:
         STR     s10, a0, 12
         STR     s11, a0, 13
 
+        sfence.vma
+        hfence.gvma
+
         // restore new context
         LDR     s11, a1, 13
         LDR     s10, a1, 12
