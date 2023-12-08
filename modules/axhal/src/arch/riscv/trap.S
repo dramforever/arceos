@@ -52,6 +52,9 @@ trap_vector_base:
     SAVE_REGS 0
     mv      a0, sp
     li      a1, 0
+    csrr t0, scause
+1:
+    bgez t0, 1b
     call    riscv_trap_handler
     RESTORE_REGS 0
     sret

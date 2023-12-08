@@ -112,6 +112,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "arceos-loader"
+version = "0.1.0"
+dependencies = [
+ "axalloc",
+ "axconfig",
+ "axruntime",
+ "axstd",
+ "cpio_reader",
+ "elf",
+ "fdt",
+]
+
+[[package]]
 name = "arceos-memtest"
 version = "0.1.0"
 dependencies = [
@@ -741,6 +754,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
 
 [[package]]
+name = "cpio_reader"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "625db7965478dc700951b2e15e9144863a0dacb31f60b0eb799c7a7b975afb5c"
+dependencies = [
+ "bitflags 1.3.2",
+]
+
+[[package]]
 name = "crate_interface"
 version = "0.1.1"
 dependencies = [
@@ -928,6 +950,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
 
 [[package]]
+name = "elf"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4445909572dbd556c457c849c4ca58623d84b27c8fff1e74b0b4227d8b90d17b"
+
+[[package]]
 name = "embedded-graphics"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -995,6 +1023,12 @@ dependencies = [
  "bitflags 1.3.2",
  "log",
 ]
+
+[[package]]
+name = "fdt"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "784a4df722dc6267a04af36895398f59d21d07dce47232adf31ec0ff2fa45e67"
 
 [[package]]
 name = "flatten_objects"

@@ -21,9 +21,14 @@ fn riscv_trap_handler(tf: &mut TrapFrame, _from_user: bool) {
         Trap::Exception(E::Breakpoint) => handle_breakpoint(&mut tf.sepc),
         Trap::Interrupt(_) => crate::trap::handle_irq_extern(scause.bits()),
         _ => {
+            let stval: usize;
+            unsafe {
+                core::arch::asm!("csrr {}, stval", out(reg) stval, options(nomem, nostack));
+            }
             panic!(
-                "Unhandled trap {:?} @ {:#x}:\n{:#x?}",
+                "Unhandled trap {:?} {:#x} @ {:#x}:\n{:#x?}",
                 scause.cause(),
+                stval,
                 tf.sepc,
                 tf
             );

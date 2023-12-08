@@ -92,6 +92,12 @@ fn is_init_ok() -> bool {
     INITED_CPUS.load(Ordering::Acquire) == axconfig::SMP
 }
 
+static mut DTB_PHYS: usize = 0;
+
+pub fn dtb_phys() -> usize {
+    unsafe { DTB_PHYS }
+}
+
 /// The main entry point of the ArceOS runtime.
 ///
 /// It is called from the bootstrapping code in [axhal]. `cpu_id` is the ID of
@@ -103,6 +109,10 @@ fn is_init_ok() -> bool {
 /// and the secondary CPUs call [`rust_main_secondary`].
 #[cfg_attr(not(test), no_mangle)]
 pub extern "C" fn rust_main(cpu_id: usize, dtb: usize) -> ! {
+    unsafe {
+        DTB_PHYS = dtb;
+    }
+
     ax_println!("{}", LOGO);
     ax_println!(
         "\

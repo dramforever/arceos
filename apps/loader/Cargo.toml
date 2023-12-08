@@ -1,0 +1,15 @@
+[package]
+name = "arceos-loader"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axstd = { path = "../../ulib/axstd", features = ["alloc", "tls"] }
+axruntime = { path = "../../modules/axruntime" }
+axconfig = { path = "../../modules/axconfig" }
+axalloc = { path = "../../modules/axalloc" }
+fdt = { version = "0.1.5", default-features = false }
+elf = { version = "0.7.4", default-features = false }
+cpio_reader = { version = "0.1.1", default-features = false }
